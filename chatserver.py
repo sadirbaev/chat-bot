@@ -12,12 +12,16 @@ class PikaMassenger():
     def __init__(self, *args, **kwargs):
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
         self.channel = self.connection.channel()
-        self.channel.exchange_declare(exchange='logs', exchange_type='fanout')
+        self.channel.exchange_declare(
+            exchange='logs', 
+            exchange_type='fanout')
 
     def consume(self, callback):
         result = self.channel.queue_declare('', exclusive=True)
         queue_name = result.method.queue
-        self.channel.queue_bind(exchange='logs', queue=queue_name)
+        self.channel.queue_bind(
+            exchange='logs', 
+            queue=queue_name)
 
         self.channel.basic_consume(
             queue=queue_name, 
