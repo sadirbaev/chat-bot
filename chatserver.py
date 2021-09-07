@@ -1,7 +1,5 @@
 import json
 import threading
-import logging
-import asyncio
 import uuid
 import pika
 from gevent.pywsgi import WSGIServer
@@ -26,6 +24,7 @@ class Chat(WebSocketApplication):
 
     def on_message(self, message, *args, **kwargs):
         if not message: return
+
         data = json.loads(message)
         data['user'] = self.userid.hex
         self.channel.basic_publish(exchange='logs', routing_key='', body=json.dumps(data))
@@ -36,7 +35,6 @@ def start_consumer():
         for client in clients:
             client.send(json.dumps(json.loads(body)))
 
-    asyncio.set_event_loop(asyncio.new_event_loop())
     connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
     channel = connection.channel()
     channel.exchange_declare(
